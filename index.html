@@ -41,8 +41,6 @@
   .steps li::before{content:counter(step);position:absolute;left:12px;top:50%;transform:translateY(-50%);width:28px;height:28px;border-radius:50%;background:var(--pink);color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:14px}
   .badges{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
   .badge{font-size:12px;padding:6px 12px;border-radius:999px;background:rgba(205,220,57,.25);border:1px solid rgba(205,220,57,.5)}
-  .referral{text-align:center}
-  .referral .big{font-size:22px;font-weight:800;color:var(--pink)}
   footer{position:relative;z-index:2;text-align:center;padding:26px 16px 40px;font-size:13px;color:#6d4c6e}
   .live{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#5a3e5c;margin-bottom:10px}
   .live .dot{width:8px;height:8px;border-radius:50%;background:#4caf50;animation:blink 1.4s infinite}
@@ -138,12 +136,6 @@
   </div>
 </section>
 
-<section class="glass referral">
-  <h2>Refer a Friend</h2>
-  <p class="big">They get 10% off. Crystal gets $5.</p>
-  <p style="margin-top:8px;font-size:14px">Share your code and earn every time someone orders.</p>
-</section>
-
 <footer>
   <div class="live"><span class="dot"></span> <span id="viewers">12</span> people viewing right now</div>
   <div>Limited run flavor: Sour Blue Razz</div>
@@ -180,25 +172,25 @@
 </div>
 
 <script>
-  const box = document.getElementById('bubbles);
+  const box = document.getElementById('bubbles');
   for(let i=0;i<18;i++){
-    const b = document.createElement('div);
+    const b = document.createElement('div');
     b.className='bubble';
     const size = 20+Math.random()*60;
     b.style.width=size+'px'; b.style.height=size+'px';
     b.style.left=Math.random()*100+'vw';
-    b.style.setProperty '--dx', (Math.random()*60-30)+'px';
+    b.style.setProperty('--dx', (Math.random()*60-30)+'px');
     b.style.animationDuration = 8+Math.random()*14+'s';
     b.style.animationDelay = Math.random()*10+'s';
     box.appendChild(b);
   }
 
-  const codeEl = document.getElementById('code);
-  const copyBtn = document.getElementById('copyBtn);
+  const codeEl = document.getElementById('code');
+  const copyBtn = document.getElementById('copyBtn');
   copyBtn.addEventListener('click', async ()=>{
     try{await navigator.clipboard.writeText(codeEl.textContent.trim());}
     catch(e){const r=document.createRange();r.selectNodeContents(codeEl);document.getSelection().removeAllRanges();document.getSelection().addRange(r);document.execCommand('copy');document.getSelection().removeAllRanges();}
-    copyBtn.textContent='Copied!'; copyBtn.classList.add('copied);
+    copyBtn.textContent='Copied!'; copyBtn.classList.add('copied');
     confetti({particleCount:120, spread:70, origin:{y:.7}, colors:['#e91e63','#cddc39','#ff6f91','#fff']});
     setTimeout(()=>{copyBtn.textContent='Copy'; copyBtn.classList.remove('copied');},1600);
   });
@@ -213,14 +205,14 @@
     btn.addEventListener('pointerleave', ()=>{btn.style.transform='';});
   });
 
-  const v = document.getElementById('viewers);
+  const v = document.getElementById('viewers');
   setInterval(()=>{
     let n = parseInt(v.textContent,10) + Math.floor(Math.random()*3)-1;
     if(n<3)n=3; if(n>60)n=60;
     v.textContent = n;
   }, 4000);
 
-  const logo = document.getElementById('logo);
+  const logo = document.getElementById('logo');
   let audioCtx;
   logo.addEventListener('mouseenter', ()=>{
     try{
@@ -236,17 +228,17 @@
     }catch(e){}
   });
 
-  const SYSTEM = 'You are Crystal\'s Loaded Tea ambassador assistant on her landing page. Answer visitor questions about Loaded Tea products. Known facts: 40+ flavors including Sour Blue Razz (limited run), zero artificial colors and flavors, B-vitamins plus caffeine for smooth energy with no crash, made in USA in a cGMP facility, FDA registered, 3rd-party tested. How to make: 32oz cup, one packet, water, ice, shake about 30 seconds. Discount code CRYSTAL85541 gives 10% off; referring a friend gives them 10% off and Crystal $5. Ambassador signup: text CRYSTAL. Do not invent prices, shipping times, health claims, or policies. If you don\'t know, say so and point them to text CRYSTAL or theloadedteashop.com. Keep answers short, friendly, and energetic.';
+  const SYSTEM = 'You are Crystal\'s Loaded Tea ambassador assistant on her landing page. Answer visitor questions about Loaded Tea products. Known facts: 40+ flavors including Sour Blue Razz (limited run), zero artificial colors and flavors, B-vitamins plus caffeine for smooth energy with no crash, made in USA in a cGMP facility, FDA registered, 3rd-party tested. How to make: 32oz cup, one packet, water, ice, shake about 30 seconds. Discount code CRYSTAL85541 gives 10% off. Ambassador signup: text CRYSTAL. Do not invent prices, shipping times, health claims, or policies. If you don\'t know, say so and point them to text CRYSTAL or theloadedteashop.com. Keep answers short, friendly, and energetic.';
 
-  const panel = document.getElementById('chatPanel);
-  const body = document.getElementById('chatBody);
-  const input = document.getElementById('chatInput);
-  const sendBtn = document.getElementById('chatSend);
-  const toggle = document.getElementById('chatToggle);
-  const closeBtn = document.getElementById('chatClose);
-  const keyBanner = document.getElementById('keyBanner);
-  const apiKeyInput = document.getElementById('apiKey);
-  const saveKeyBtn = document.getElementById('saveKey);
+  const panel = document.getElementById('chatPanel');
+  const body = document.getElementById('chatBody');
+  const input = document.getElementById('chatInput');
+  const sendBtn = document.getElementById('chatSend');
+  const toggle = document.getElementById('chatToggle');
+  const closeBtn = document.getElementById('chatClose');
+  const keyBanner = document.getElementById('keyBanner');
+  const apiKeyInput = document.getElementById('apiKey');
+  const saveKeyBtn = document.getElementById('saveKey');
 
   let key = localStorage.getItem('lt_groq_key') || '';
   if(!key) keyBanner.style.display='block';
@@ -259,17 +251,17 @@
   });
 
   function addMsg(text, who){
-    const d = document.createElement('div);
+    const d = document.createElement('div');
     d.className='msg '+who;
-    d.innerHTML='<div class="who">'+(who==='bot'?'Assistant':'You')+'</div>'+text.replace(/</g,'&lt;);
+    d.innerHTML='<div class="who">'+(who==='bot'?'Assistant':'You')+'</div>'+text.replace(/</g,'&lt;');
     body.appendChild(d);
     body.scrollTop = body.scrollHeight;
     return d;
   }
 
   async function ask(q){
-    addMsg(q,'user);
-    const typing = document.createElement('div);
+    addMsg(q,'user');
+    const typing = document.createElement('div');
     typing.className='typing'; typing.textContent='thinking...';
     body.appendChild(typing); body.scrollTop=body.scrollHeight;
     sendBtn.disabled=true;
@@ -287,10 +279,10 @@
       const data = await res.json();
       typing.remove();
       if(!res.ok) throw new Error(data.error?.message || 'API error '+res.status);
-      addMsg(data.choices[0].message.content,'bot);
+      addMsg(data.choices[0].message.content,'bot');
     }catch(e){
       typing.remove();
-      addMsg('Oops — '+e.message,'bot);
+      addMsg('Oops — '+e.message,'bot');
     }
     sendBtn.disabled=false; input.focus();
   }
