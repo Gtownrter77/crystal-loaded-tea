@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Loaded Tea | Ambassador Crystal</title>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+<style>
+  :root{--pink:#e91e63;--lime:#cddc39;--cream:#fff8f0;--ink:#2b1b2e}
+  *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+  body{color:var(--ink);overflow-x:hidden;background:linear-gradient(120deg,#fff8f0 0%,#fce4ec 40%,#f3e5f5 100%);background-size:300% 300%;animation:gradShift 18s ease infinite}
+  @keyframes gradShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+  .bubbles{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+  .bubble{position:absolute;bottom:-10vh;border-radius:50%;background:radial-gradient(circle at 30% 30%,rgba(233,30,99,.25),rgba(205,220,57,.15));animation:rise linear infinite;will-change:transform,opacity}
+  @keyframes rise{0%{transform:translateY(0) translateX(0) scale(.6);opacity:0}10%{opacity:.7}90%{opacity:.7}100%{transform:translateY(-110vh) translateX(var(--dx)) scale(1.1);opacity:0}}
+  .glass{background:rgba(255,255,255,.55);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.6);border-radius:18px;box-shadow:0 8px 32px rgba(43,27,46,.08)}
+  header{position:relative;z-index:2;text-align:center;padding:28px 16px 10px}
+  .logo{display:inline-block;font-size:28px;font-weight:800;letter-spacing:1px;background:linear-gradient(90deg,var(--pink),var(--lime));-webkit-background-clip:text;background-clip:text;color:transparent;cursor:pointer;transition:transform .25s ease, filter .25s ease}
+  .logo:hover{transform:scale(1.08) rotate(-2deg);filter:drop-shadow(0 6px 14px rgba(233,30,99,.45))}
+  .tag{margin-top:6px;font-size:14px;color:#6d4c6e}
+  .hero{position:relative;z-index:2;max-width:640px;margin:18px auto;padding:28px 22px;text-align:center}
+  .hero h1{font-size:30px;line-height:1.2;margin-bottom:10px}
+  .hero p{font-size:16px;color:#5a3e5c;margin-bottom:18px}
+  .cta{display:inline-flex;align-items:center;gap:10px;background:linear-gradient(90deg,var(--pink),#ff6f91);color:#fff;font-weight:700;font-size:17px;padding:14px 26px;border-radius:999px;text-decoration:none;box-shadow:0 10px 24px rgba(233,30,99,.35);transition:transform .2s ease, box-shadow .2s ease}
+  .cta:hover{transform:translateY(-2px) scale(1.03);box-shadow:0 14px 30px rgba(233,30,99,.5)}
+  .cta:active{transform:scale(.98)}
+  .code-row{margin-top:14px;display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap}
+  .code{font-family:ui-monospace,Consolas,monospace;background:#2b1b2e;color:#fff;padding:8px 14px;border-radius:10px;letter-spacing:2px;font-size:15px}
+  .copy-btn{background:var(--lime);color:var(--ink);border:0;border-radius:10px;padding:8px 14px;font-weight:700;cursor:pointer;transition:transform .15s ease}
+  .copy-btn:hover{transform:scale(1.06)}
+  .copy-btn:active{transform:scale(.95)}
+  .copied{animation:pop .4s ease}
+  @keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.15)}100%{transform:scale(1)}}
+  section{position:relative;z-index:2;max-width:640px;margin:16px auto;padding:22px}
+  h2{font-size:20px;margin-bottom:12px}
+  .benefits{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .benefit{padding:14px;font-size:14px}
+  .benefit b{display:block;color:var(--pink);margin-bottom:4px}
+  .steps{counter-reset:step;list-style:none}
+  .steps li{counter-increment:step;padding:12px 14px 12px 52px;position:relative;margin-bottom:8px}
+  .steps li::before{content:counter(step);position:absolute;left:12px;top:50%;transform:translateY(-50%);width:28px;height:28px;border-radius:50%;background:var(--pink);color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:14px}
+  .badges{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+  .badge{font-size:12px;padding:6px 12px;border-radius:999px;background:rgba(205,220,57,.25);border:1px solid rgba(205,220,57,.5)}
+  .referral{text-align:center}
+  .referral .big{font-size:22px;font-weight:800;color:var(--pink)}
+  footer{position:relative;z-index:2;text-align:center;padding:26px 16px 40px;font-size:13px;color:#6d4c6e}
+  .live{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#5a3e5c;margin-bottom:10px}
+  .live .dot{width:8px;height:8px;border-radius:50%;background:#4caf50;animation:blink 1.4s infinite}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+  .magnetic{transition:transform .15s ease-out}
+  .chat-toggle{position:fixed;bottom:22px;right:22px;z-index:100;width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,var(--pink),#ff6f91);border:0;color:#fff;font-size:26px;cursor:pointer;box-shadow:0 10px 28px rgba(233,30,99,.45);transition:transform .2s ease}
+  .chat-toggle:hover{transform:scale(1.08)}
+  .chat-panel{position:fixed;bottom:92px;right:22px;z-index:100;width:min(380px,calc(100vw - 32px));height:min(540px,calc(100vh - 120px));display:flex;flex-direction:column;border-radius:20px;overflow:hidden;box-shadow:0 16px 48px rgba(43,27,46,.28);transform:translateY(20px) scale(.95);opacity:0;pointer-events:none;transition:transform .25s ease, opacity .25s ease}
+  .chat-panel.open{transform:translateY(0) scale(1);opacity:1;pointer-events:auto}
+  .chat-head{background:linear-gradient(90deg,var(--pink),#ff6f91);color:#fff;padding:14px 16px;display:flex;align-items:center;justify-content:space-between}
+  .chat-head b{font-size:15px}
+  .chat-head span{font-size:12px;opacity:.85}
+  .chat-head button{background:none;border:0;color:#fff;font-size:20px;cursor:pointer}
+  .chat-body{flex:1;overflow-y:auto;padding:14px;background:rgba(255,248,240,.92);display:flex;flex-direction:column;gap:10px}
+  .msg{max-width:85%;padding:10px 14px;border-radius:16px;font-size:14px;line-height:1.45}
+  .msg.bot{align-self:flex-start;background:#fff;border:1px solid #f0d9e6;border-bottom-left-radius:4px}
+  .msg.user{align-self:flex-end;background:linear-gradient(90deg,var(--pink),#ff6f91);color:#fff;border-bottom-right-radius:4px}
+  .msg .who{font-size:11px;font-weight:700;margin-bottom:3px;opacity:.7}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;padding:8px 12px 0;background:#fff;border-top:1px solid #f0d9e6}
+  .chip{font-size:12px;padding:6px 10px;border-radius:999px;border:1px solid #e8cfe0;background:#fff8f0;color:#5a3e5c;cursor:pointer;transition:background .15s ease, transform .15s ease}
+  .chip:hover{background:#fce4ec;transform:scale(1.04)}
+  .chat-input{display:flex;gap:8px;padding:12px;background:#fff;border-top:1px solid #f0d9e6}
+  .chat-input input{flex:1;border:1px solid #e8cfe0;border-radius:12px;padding:10px 14px;font-size:14px;outline:none}
+  .chat-input input:focus{border-color:var(--pink)}
+  .chat-input button{background:var(--pink);color:#fff;border:0;border-radius:12px;padding:10px 16px;font-weight:700;cursor:pointer}
+  .chat-input button:disabled{opacity:.5;cursor:not-allowed}
+  .typing{align-self:flex-start;font-size:12px;color:#8a6a8c;padding:4px 14px}
+  .key-banner{position:fixed;bottom:92px;right:22px;z-index:99;width:min(380px,calc(100vw - 32px));background:#2b1b2e;color:#fff;border-radius:14px;padding:14px;font-size:13px;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+  .key-banner input{width:100%;margin:8px 0;padding:8px 10px;border-radius:8px;border:0;font-size:13px}
+  .key-banner button{background:var(--lime);color:var(--ink);border:0;border-radius:8px;padding:8px 14px;font-weight:700;cursor:pointer;width:100%}
+  .key-banner .small{font-size:11px;opacity:.7;margin-top:6px}
+  @media(max-width:480px){
+    .hero h1{font-size:24px}
+    .benefits{grid-template-columns:1fr}
+    .cta{width:100%;justify-content:center}
+    .chat-toggle{bottom:16px;right:16px}
+    .chat-panel,.key-banner{right:16px;bottom:84px}
+  }
+</style>
+</head>
+<body>
+<div class="bubbles" id="bubbles"></div>
+
+<header>
+  <div class="logo" id="logo">LOADED TEA</div>
+  <div class="tag">Ambassador Crystal &middot; Code CRYSTAL85541</div>
+</header>
+
+<div class="hero glass">
+  <h1>Zero calories. Zero guilt.<br>Maximum energy.</h1>
+  <p>Crystal's exclusive ambassador link. Use her code for 10% off your first order.</p>
+  <a class="cta magnetic" id="shopBtn" href="https://theloadedteashop.com" target="_blank" rel="noreferrer">Shop with Code CRYSTAL85541</a>
+  <div class="code-row">
+    <div class="code" id="code">CRYSTAL85541</div>
+    <button class="copy-btn" id="copyBtn">Copy</button>
+  </div>
+</div>
+
+<section class="glass">
+  <h2>Why Loaded Tea</h2>
+  <div class="benefits">
+    <div class="benefit"><b>Zero artificial colors</b>Clean ingredients you can actually read</div>
+    <div class="benefit"><b>B-vitamins + caffeine</b>Smooth lift, no crash</div>
+    <div class="benefit"><b>40+ flavors</b>From Sour Blue Razz to tropical blends</div>
+    <div class="benefit"><b>Made in USA</b>cGMP facility, 3rd-party tested</div>
+  </div>
+  <div style="text-align:center;margin-top:16px">
+    <a class="cta magnetic" href="https://theloadedteashop.com" target="_blank" rel="noreferrer">Grab Yours Now</a>
+  </div>
+</section>
+
+<section class="glass">
+  <h2>How to Order</h2>
+  <ol class="steps">
+    <li>Grab a 32oz cup</li>
+    <li>Add your Loaded Tea packet</li>
+    <li>Fill with water + ice, shake 30 seconds</li>
+    <li>Enjoy the energy</li>
+  </ol>
+  <div style="text-align:center;margin-top:14px">
+    <a class="cta magnetic" href="https://theloadedteashop.com" target="_blank" rel="noreferrer">Start Brewing</a>
+  </div>
+</section>
+
+<section class="glass">
+  <h2>Trust</h2>
+  <div class="badges">
+    <span class="badge">Made in USA</span>
+    <span class="badge">cGMP Certified</span>
+    <span class="badge">FDA Registered</span>
+    <span class="badge">3rd-Party Tested</span>
+    <span class="badge">No Artificial Sweeteners</span>
+  </div>
+</section>
+
+<section class="glass referral">
+  <h2>Refer a Friend</h2>
+  <p class="big">They get 10% off. Crystal gets $5.</p>
+  <p style="margin-top:8px;font-size:14px">Share your code and earn every time someone orders.</p>
+</section>
+
+<footer>
+  <div class="live"><span class="dot"></span> <span id="viewers">12</span> people viewing right now</div>
+  <div>Limited run flavor: Sour Blue Razz</div>
+  <div style="margin-top:8px">Text CRYSTAL to sign up &middot; theloadedteashop.com</div>
+</footer>
+
+<button class="chat-toggle" id="chatToggle" title="Chat with Crystal's tea assistant">&#128172;</button>
+
+<div class="key-banner" id="keyBanner" style="display:none">
+  <b>One-time setup:</b> paste a free Groq API key to unlock real answers.<br>
+  <input id="apiKey" placeholder="gsk_..." autocomplete="off">
+  <button id="saveKey">Save Key</button>
+  <div class="small">Free at console dot groq dot com — Llama 3.1, no credit card. Key stays in your browser only.</div>
+</div>
+
+<div class="chat-panel" id="chatPanel">
+  <div class="chat-head">
+    <div><b>Crystal's Tea Assistant</b><br><span>Ask about flavors, energy, ingredients</span></div>
+    <button id="chatClose">&#215;</button>
+  </div>
+  <div class="chat-body" id="chatBody">
+    <div class="msg bot"><div class="who">Assistant</div>Hey! I'm Crystal's Loaded Tea helper. Ask me anything — best flavors for focus, how the energy feels, what's in it, you name it.</div>
+  </div>
+  <div class="chips" id="chips">
+    <button class="chip" data-q="Which flavor is best for focus?">Best for focus?</button>
+    <button class="chip" data-q="Does it have a crash after the energy wears off?">Any crash?</button>
+    <button class="chip" data-q="What is in Loaded Tea ingredients-wise?">What's in it?</button>
+    <button class="chip" data-q="How do I use code CRYSTAL85541?">How do I use my code?</button>
+  </div>
+  <div class="chat-input">
+    <input id="chatInput" placeholder="e.g. Which tea is best before a workout?" autocomplete="off">
+    <button id="chatSend">Send</button>
+  </div>
+</div>
+
+<script>
+  const box = document.getElementById('bubbles);
+  for(let i=0;i<18;i++){
+    const b = document.createElement('div);
+    b.className='bubble';
+    const size = 20+Math.random()*60;
+    b.style.width=size+'px'; b.style.height=size+'px';
+    b.style.left=Math.random()*100+'vw';
+    b.style.setProperty '--dx', (Math.random()*60-30)+'px';
+    b.style.animationDuration = 8+Math.random()*14+'s';
+    b.style.animationDelay = Math.random()*10+'s';
+    box.appendChild(b);
+  }
+
+  const codeEl = document.getElementById('code);
+  const copyBtn = document.getElementById('copyBtn);
+  copyBtn.addEventListener('click', async ()=>{
+    try{await navigator.clipboard.writeText(codeEl.textContent.trim());}
+    catch(e){const r=document.createRange();r.selectNodeContents(codeEl);document.getSelection().removeAllRanges();document.getSelection().addRange(r);document.execCommand('copy');document.getSelection().removeAllRanges();}
+    copyBtn.textContent='Copied!'; copyBtn.classList.add('copied);
+    confetti({particleCount:120, spread:70, origin:{y:.7}, colors:['#e91e63','#cddc39','#ff6f91','#fff']});
+    setTimeout(()=>{copyBtn.textContent='Copy'; copyBtn.classList.remove('copied');},1600);
+  });
+
+  document.querySelectorAll('.magnetic').forEach(btn=>{
+    btn.addEventListener('pointermove', e=>{
+      const r = btn.getBoundingClientRect();
+      const x = e.clientX - (r.left+r.width/2);
+      const y = e.clientY - (r.top+r.height/2);
+      btn.style.transform = 'translate('+x*.25+'px, '+y*.25+'px)';
+    });
+    btn.addEventListener('pointerleave', ()=>{btn.style.transform='';});
+  });
+
+  const v = document.getElementById('viewers);
+  setInterval(()=>{
+    let n = parseInt(v.textContent,10) + Math.floor(Math.random()*3)-1;
+    if(n<3)n=3; if(n>60)n=60;
+    v.textContent = n;
+  }, 4000);
+
+  const logo = document.getElementById('logo);
+  let audioCtx;
+  logo.addEventListener('mouseenter', ()=>{
+    try{
+      if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+      const o = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      o.type='sine'; o.frequency.value=880;
+      g.gain.setValueAtTime(.0001, audioCtx.currentTime);
+      g.gain.exponentialRampToValueAtTime(.05, audioCtx.currentTime+.02);
+      g.gain.exponentialRampToValueAtTime(.0001, audioCtx.currentTime+.25);
+      o.connect(g); g.connect(audioCtx.destination);
+      o.start(); o.stop(audioCtx.currentTime+.3);
+    }catch(e){}
+  });
+
+  const SYSTEM = 'You are Crystal\'s Loaded Tea ambassador assistant on her landing page. Answer visitor questions about Loaded Tea products. Known facts: 40+ flavors including Sour Blue Razz (limited run), zero artificial colors and flavors, B-vitamins plus caffeine for smooth energy with no crash, made in USA in a cGMP facility, FDA registered, 3rd-party tested. How to make: 32oz cup, one packet, water, ice, shake about 30 seconds. Discount code CRYSTAL85541 gives 10% off; referring a friend gives them 10% off and Crystal $5. Ambassador signup: text CRYSTAL. Do not invent prices, shipping times, health claims, or policies. If you don\'t know, say so and point them to text CRYSTAL or theloadedteashop.com. Keep answers short, friendly, and energetic.';
+
+  const panel = document.getElementById('chatPanel);
+  const body = document.getElementById('chatBody);
+  const input = document.getElementById('chatInput);
+  const sendBtn = document.getElementById('chatSend);
+  const toggle = document.getElementById('chatToggle);
+  const closeBtn = document.getElementById('chatClose);
+  const keyBanner = document.getElementById('keyBanner);
+  const apiKeyInput = document.getElementById('apiKey);
+  const saveKeyBtn = document.getElementById('saveKey);
+
+  let key = localStorage.getItem('lt_groq_key') || '';
+  if(!key) keyBanner.style.display='block';
+
+  toggle.addEventListener('click', ()=>panel.classList.toggle('open'));
+  closeBtn.addEventListener('click', ()=>panel.classList.remove('open'));
+  saveKeyBtn.addEventListener('click', ()=>{
+    key = apiKeyInput.value.trim();
+    if(key){localStorage.setItem('lt_groq_key', key); keyBanner.style.display='none';}
+  });
+
+  function addMsg(text, who){
+    const d = document.createElement('div);
+    d.className='msg '+who;
+    d.innerHTML='<div class="who">'+(who==='bot'?'Assistant':'You')+'</div>'+text.replace(/</g,'&lt;);
+    body.appendChild(d);
+    body.scrollTop = body.scrollHeight;
+    return d;
+  }
+
+  async function ask(q){
+    addMsg(q,'user);
+    const typing = document.createElement('div);
+    typing.className='typing'; typing.textContent='thinking...';
+    body.appendChild(typing); body.scrollTop=body.scrollHeight;
+    sendBtn.disabled=true;
+    try{
+      if(!key) throw new Error('No API key set. Paste a free Groq key above.');
+      const res = await fetch('https://api.groq.com/openai/v1/chat/completions',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+        body:JSON.stringify({
+          model:'llama-3.1-8b-instant',
+          messages:[{role:'system',content:SYSTEM},{role:'user',content:q}],
+          temperature:.7, max_tokens:300
+        })
+      });
+      const data = await res.json();
+      typing.remove();
+      if(!res.ok) throw new Error(data.error?.message || 'API error '+res.status);
+      addMsg(data.choices[0].message.content,'bot);
+    }catch(e){
+      typing.remove();
+      addMsg('Oops — '+e.message,'bot);
+    }
+    sendBtn.disabled=false; input.focus();
+  }
+
+  sendBtn.addEventListener('click', ()=>{const q=input.value.trim(); if(q){input.value=''; ask(q);}});
+  input.addEventListener('keydown', e=>{if(e.key==='Enter'){const q=input.value.trim(); if(q){input.value=''; ask(q);}}});
+  document.querySelectorAll('.chip').forEach(c=>{
+    c.addEventListener('click', ()=>{const q=c.getAttribute('data-q'); if(q) ask(q);});
+  });
+</script>
+</body>
+</html>
