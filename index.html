@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Loaded Tea | Ambassador Crystal</title>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.186.1/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.186.1/examples/jsm/"}}</script>
 <style>
   :root{--pink:#e91e63;--lime:#cddc39;--cream:#fff8f0;--ink:#2b1b2e}
   *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
@@ -79,6 +80,13 @@
     .chat-toggle{bottom:16px;right:16px}
     .chat-panel,.key-banner{right:16px;bottom:84px}
   }
+  /* 3D tea cup + bubble stage (decorative; static SVG is the default/fallback) */
+  .cup-stage{position:relative;z-index:2;display:block;width:100%;max-width:340px;height:240px;margin:6px auto -4px;pointer-events:none}
+  .cup-stage svg{display:block;width:100%;height:100%;transition:opacity .7s ease}
+  html.has3d .cup-stage svg{opacity:0}
+  .tea3d{position:fixed;top:0;left:0;width:100%;height:100%;z-index:1;pointer-events:none;opacity:0;transition:opacity .9s ease}
+  @media(min-width:1100px){.cup-stage{position:absolute;top:96px;left:calc(50% + 336px);width:min(300px,calc(50% - 346px));max-width:none;height:470px;margin:0}}
+  @media(max-width:480px){.cup-stage{height:205px;margin-top:2px}}
 </style>
 </head>
 <body>
@@ -88,6 +96,53 @@
   <div class="logo" id="logo">LOADED TEA</div>
   <div class="tag">Ambassador Crystal &middot; Code CRYSTAL85541</div>
 </header>
+
+<div class="cup-stage" id="cupStage" aria-hidden="true">
+  <svg viewBox="0 0 300 470" preserveAspectRatio="xMidYMid meet" focusable="false" role="presentation">
+    <defs>
+      <linearGradient id="svTea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f9c58c"/><stop offset=".55" stop-color="#f0a25c"/><stop offset="1" stop-color="#d9773a"/></linearGradient>
+      <linearGradient id="svGlass" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".18" stop-color="#fff" stop-opacity=".12"/><stop offset=".8" stop-color="#fff" stop-opacity=".06"/><stop offset="1" stop-color="#fff" stop-opacity=".45"/></linearGradient>
+      <linearGradient id="svLid" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".85"/><stop offset="1" stop-color="#fde7ef" stop-opacity=".55"/></linearGradient>
+      <radialGradient id="svBub" cx=".32" cy=".3" r=".75"><stop offset="0" stop-color="#fff" stop-opacity=".95"/><stop offset=".35" stop-color="#ffd6e4" stop-opacity=".45"/><stop offset=".8" stop-color="#e6f0b0" stop-opacity=".35"/><stop offset="1" stop-color="#e91e63" stop-opacity=".25"/></radialGradient>
+      <radialGradient id="svShadow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#2b1b2e" stop-opacity=".28"/><stop offset="1" stop-color="#2b1b2e" stop-opacity="0"/></radialGradient>
+      <pattern id="svStripe" width="18" height="18" patternUnits="userSpaceOnUse" patternTransform="rotate(35)"><rect width="18" height="18" fill="#ff6f91"/><rect width="8" height="18" fill="#fff8f0"/></pattern>
+    </defs>
+    <ellipse cx="150" cy="440" rx="96" ry="16" fill="url(#svShadow)"/>
+    <path d="M80 178 L100 410 Q102 424 117 424 L183 424 Q198 424 200 410 L220 178 Z" fill="url(#svTea)"/>
+    <ellipse cx="150" cy="178" rx="70" ry="9" fill="#fbd6aa"/>
+    <g fill="#f4fbff" fill-opacity=".6" stroke="#fff" stroke-opacity=".9" stroke-width="2">
+      <rect x="96" y="160" width="40" height="40" rx="10" transform="rotate(-14 116 180)"/>
+      <rect x="160" y="166" width="38" height="38" rx="10" transform="rotate(18 179 185)"/>
+      <rect x="118" y="214" width="34" height="34" rx="9" transform="rotate(8 135 231)"/>
+      <rect x="166" y="250" width="30" height="30" rx="8" transform="rotate(-20 181 265)"/>
+    </g>
+    <g transform="rotate(-6 150 240)"><rect x="141" y="30" width="18" height="380" rx="9" fill="url(#svStripe)"/></g>
+    <path d="M70 130 L98 412 Q100 430 118 430 L182 430 Q200 430 202 412 L230 130 Z" fill="url(#svGlass)" stroke="#fff" stroke-opacity=".8" stroke-width="2.5"/>
+    <path d="M86 150 L106 400" stroke="#fff" stroke-opacity=".7" stroke-width="6" stroke-linecap="round"/>
+    <g stroke="#fff" stroke-opacity=".35" stroke-width="1.5">
+      <path d="M78 210 H222"/><path d="M80 236 H220"/><path d="M83 262 H217"/><path d="M85 288 H215"/><path d="M88 340 H212"/><path d="M90 366 H210"/>
+    </g>
+    <path d="M78 124 Q80 66 150 62 Q220 66 222 124 Z" fill="url(#svLid)" stroke="#fff" stroke-width="2.5"/>
+    <rect x="62" y="118" width="176" height="20" rx="10" fill="#fff" fill-opacity=".85" stroke="#f6d3e0" stroke-width="2"/>
+    <path d="M68 128 H232" stroke="#f3c6d6" stroke-width="1.5"/>
+    <g transform="rotate(-6 150 240)"><rect x="141" y="22" width="18" height="44" rx="9" fill="url(#svStripe)"/></g>
+    <g>
+      <ellipse cx="124" cy="306" rx="7" ry="8.5" fill="#2b1b2e"/><ellipse cx="176" cy="306" rx="7" ry="8.5" fill="#2b1b2e"/>
+      <circle cx="121.5" cy="302.5" r="2.4" fill="#fff"/><circle cx="173.5" cy="302.5" r="2.4" fill="#fff"/>
+      <path d="M139 320 Q150 332 161 320" fill="none" stroke="#2b1b2e" stroke-width="4" stroke-linecap="round"/>
+      <ellipse cx="108" cy="322" rx="10" ry="6" fill="#ff8fab" fill-opacity=".7"/><ellipse cx="192" cy="322" rx="10" ry="6" fill="#ff8fab" fill-opacity=".7"/>
+    </g>
+    <g fill="#fff" fill-opacity=".8">
+      <circle cx="96" cy="230" r="2.6"/><circle cx="210" cy="216" r="3"/><circle cx="204" cy="352" r="2.4"/><circle cx="100" cy="372" r="3.2"/><circle cx="214" cy="290" r="2"/><circle cx="92" cy="282" r="2.2"/><circle cx="196" cy="396" r="2.6"/>
+    </g>
+    <g fill="url(#svBub)" stroke="#fff" stroke-opacity=".7" stroke-width="1.5">
+      <circle cx="40" cy="96" r="20"/><circle cx="262" cy="70" r="14"/><circle cx="270" cy="232" r="24"/><circle cx="30" cy="300" r="15"/><circle cx="252" cy="378" r="10"/><circle cx="58" cy="404" r="9"/><circle cx="236" cy="150" r="7"/><circle cx="22" cy="190" r="7"/>
+    </g>
+    <g fill="#f4fbff" fill-opacity=".7" stroke="#fff" stroke-width="1.5">
+      <rect x="44" y="150" width="18" height="18" rx="5" transform="rotate(20 53 159)"/><rect x="252" y="300" width="16" height="16" rx="4" transform="rotate(-15 260 308)"/><rect x="256" y="12" width="14" height="14" rx="4" transform="rotate(30 263 19)"/>
+    </g>
+  </svg>
+</div>
 
 <div class="hero glass">
   <h1>Zero calories. Zero guilt.<br>Maximum energy.</h1>
@@ -292,6 +347,551 @@
   document.querySelectorAll('.chip').forEach(c=>{
     c.addEventListener('click', ()=>{const q=c.getAttribute('data-q'); if(q) ask(q);});
   });
+</script>
+<script type="module">
+// Decorative 3D tea cup + bubble field. Purely progressive enhancement:
+// all page content works without it, and the inline SVG in #cupStage is the still image.
+const root = document.documentElement;
+const stage = document.getElementById('cupStage');
+const heroEl = document.querySelector('.hero');
+let api = null;
+
+function useStill(reason){
+  if(api){ try{ api.dispose(); }catch(e){} api = null; }
+  root.classList.remove('has3d');
+  root.classList.add('no3d');
+  if(reason) console.info('[tea3d] showing still image:', reason);
+}
+
+function why3dSkipped(){
+  try{
+    if(!stage || !heroEl) return 'stage missing';
+    if(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return 'reduced motion';
+    const cores = navigator.hardwareConcurrency, mem = navigator.deviceMemory;
+    if(cores && cores <= 2) return 'low core count';
+    if(mem && mem <= 2) return 'low device memory';
+    const probe = document.createElement('canvas');
+    const gl = probe.getContext('webgl2');
+    if(!gl) return 'no WebGL2';
+    const lose = gl.getExtension('WEBGL_lose_context');
+    if(lose) lose.loseContext();
+    return '';
+  }catch(e){ return 'capability check failed'; }
+}
+
+const afterLoad = () => new Promise(r => {
+  if(document.readyState === 'complete') r();
+  else addEventListener('load', () => r(), { once:true });
+});
+const whenIdle = () => new Promise(r => {
+  if('requestIdleCallback' in window) requestIdleCallback(() => r(), { timeout:1200 });
+  else setTimeout(r, 250);
+});
+
+(async () => {
+  const skip = why3dSkipped();
+  if(skip){ useStill(skip); return; }
+  try{
+    await afterLoad();
+    await whenIdle();
+    const [THREE, envMod, rbMod] = await Promise.all([
+      import('three'),
+      import('three/addons/environments/RoomEnvironment.js'),
+      import('three/addons/geometries/RoundedBoxGeometry.js')
+    ]);
+    api = startTea3D(THREE, envMod.RoomEnvironment, rbMod.RoundedBoxGeometry);
+    const mq = matchMedia('(prefers-reduced-motion: reduce)');
+    if(mq.addEventListener) mq.addEventListener('change', e => { if(e.matches) useStill('reduced motion'); });
+  }catch(e){
+    console.warn('[tea3d] 3D disabled:', e && e.message ? e.message : e);
+    useStill();
+  }
+})();
+
+function startTea3D(THREE, RoomEnvironment, RoundedBoxGeometry){
+  const V2 = THREE.Vector2, V3 = THREE.Vector3;
+  const mobile = matchMedia('(pointer: coarse)').matches || innerWidth < 768;
+  const TAU = Math.PI * 2;
+  const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+  const rand = (a, b) => a + Math.random() * (b - a);
+
+  // ---------- renderer ----------
+  const canvas = document.createElement('canvas');
+  canvas.className = 'tea3d';
+  canvas.setAttribute('aria-hidden', 'true');
+  canvas.setAttribute('role', 'presentation');
+  canvas.tabIndex = -1;
+  document.body.insertBefore(canvas, document.body.firstChild);
+  let renderer;
+  try{
+    renderer = new THREE.WebGLRenderer({ canvas, antialias: !mobile, alpha: true, powerPreference: mobile ? 'low-power' : 'high-performance' });
+  }catch(e){ canvas.remove(); throw e; }
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, mobile ? 1.25 : 1.5));
+  renderer.setClearColor(0x000000, 0);
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.toneMapping = THREE.NeutralToneMapping;
+  renderer.toneMappingExposure = 1.0;
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFShadowMap;
+
+  const scene = new THREE.Scene();
+  const FOV = 30, CAM_Z = 14;
+  const camera = new THREE.PerspectiveCamera(FOV, innerWidth / innerHeight, 0.1, 60);
+  camera.position.set(0, 0, CAM_Z);
+  const TANH = Math.tan(THREE.MathUtils.degToRad(FOV / 2));
+
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  const room = new RoomEnvironment();
+  const envRT = pmrem.fromScene(room, 0.04);
+  scene.environment = envRT.texture;
+  scene.environmentIntensity = 0.85;
+  if(room.dispose) room.dispose();
+  pmrem.dispose();
+
+  // ---------- lights: hemisphere + soft key with shadows + pink rim ----------
+  scene.add(new THREE.HemisphereLight(0xfff4e8, 0xf6c9d8, 1.15));
+  const key = new THREE.DirectionalLight(0xfff0dc, 2.3);
+  key.castShadow = true;
+  key.shadow.mapSize.set(mobile ? 512 : 1024, mobile ? 512 : 1024);
+  key.shadow.bias = -0.0004;
+  key.shadow.normalBias = 0.02;
+  key.shadow.radius = 5;
+  scene.add(key, key.target);
+  const rim = new THREE.DirectionalLight(0xffb3cf, 1.7);
+  rim.position.set(-6, 3, -5);
+  scene.add(rim);
+  const fill = new THREE.DirectionalLight(0xe9f2b8, 0.45);
+  fill.position.set(5, -2, 4);
+  scene.add(fill);
+
+  // ---------- cup (all procedural) ----------
+  const H = 3.0, RB = 0.66, RT = 0.9, BASE = 0.2, FILL = 2.32;
+  const LIP = 0.038;
+  const R = y => RB + (RT - RB) * (y / H);
+  const rib = y => (y > 0.4 && y < H - 0.5) ? 0.011 * (0.5 - 0.5 * Math.cos(TAU * y * 5.5)) : 0;
+  const IR = y => R(y) - 2 * LIP;
+  const SEG = mobile ? 56 : 96;
+
+  const anchor = new THREE.Group();   // follows #cupStage on screen
+  const tilt = new THREE.Group();     // pointer tilt + bob + hop
+  const squish = new THREE.Group();   // tap squash/stretch
+  const spin = new THREE.Group();     // slow spin
+  const body = new THREE.Group();     // geometry, centered vertically
+  anchor.rotation.x = 0.26;           // look slightly down onto the lid
+  anchor.add(tilt); tilt.add(squish); squish.add(spin); spin.add(body);
+  body.position.y = -2.2;
+  scene.add(anchor);
+
+  // glass wall: lathe profile with rounded base, ribbing and rolled lip
+  const wall = [new V2(0.0001, 0)];
+  for(let i = 0; i <= 8; i++){ const a = -Math.PI / 2 + (i / 8) * (Math.PI / 2); wall.push(new V2(RB - 0.1 + Math.cos(a) * 0.1, 0.1 + Math.sin(a) * 0.1)); }
+  const WN = mobile ? 90 : 150;
+  for(let i = 1; i <= WN; i++){ const y = 0.1 + (H - 0.06 - 0.1) * i / WN; wall.push(new V2(R(y) + rib(y), y)); }
+  const lc = R(H) - LIP;
+  for(let i = 1; i <= 10; i++){ const a = (i / 10) * Math.PI; wall.push(new V2(lc + Math.cos(a) * LIP, H - 0.06 + Math.sin(a) * LIP * 1.3)); }
+  for(let i = 1; i <= 40; i++){ const y = (H - 0.06) - (H - 0.06 - BASE) * i / 40; wall.push(new V2(IR(y), y)); }
+  wall.push(new V2(0.0001, BASE));
+  const glassMat = new THREE.MeshPhysicalMaterial({
+    color: 0xfff6f0, roughness: 0.05, metalness: 0, transparent: true, opacity: 0.15,
+    clearcoat: 1, clearcoatRoughness: 0.03, specularIntensity: 1, ior: 1.5,
+    iridescence: 0.12, envMapIntensity: 1.6, side: THREE.DoubleSide, depthWrite: false
+  });
+  const glass = new THREE.Mesh(new THREE.LatheGeometry(wall, SEG), glassMat);
+  glass.renderOrder = 3;
+  body.add(glass);
+
+  // tea liquid with amber->peach vertical gradient and meniscus
+  const tea = [new V2(0.0001, BASE + 0.005), new V2(IR(BASE) - 0.05, BASE + 0.005)];
+  for(let i = 0; i <= 30; i++){ const y = BASE + 0.05 + (FILL - BASE - 0.05) * i / 30; tea.push(new V2(IR(y) - 0.006, y)); }
+  tea.push(new V2(IR(FILL) - 0.04, FILL + 0.012));
+  tea.push(new V2(0.0001, FILL));
+  const teaGeo = new THREE.LatheGeometry(tea, SEG);
+  { const p = teaGeo.attributes.position, cols = new Float32Array(p.count * 3);
+    const deep = new THREE.Color(0x96380a), light = new THREE.Color(0xe98535), c = new THREE.Color();
+    for(let i = 0; i < p.count; i++){ c.copy(deep).lerp(light, clamp((p.getY(i) - BASE) / (FILL - BASE), 0, 1) ** 0.8); cols.set([c.r, c.g, c.b], i * 3); }
+    teaGeo.setAttribute('color', new THREE.BufferAttribute(cols, 3)); }
+  const teaMat = new THREE.MeshPhysicalMaterial({
+    color: 0xffffff, vertexColors: true, roughness: 0.14, transparent: true, opacity: 0.88,
+    clearcoat: 0.7, clearcoatRoughness: 0.1, sheen: 0.5, sheenColor: new THREE.Color(0xffd7b0),
+    emissive: new THREE.Color(0x7a300a), emissiveIntensity: 0.16, depthWrite: false
+  });
+  const teaMesh = new THREE.Mesh(teaGeo, teaMat);
+  teaMesh.renderOrder = 2; teaMesh.castShadow = true;
+  body.add(teaMesh);
+  const foam = new THREE.Mesh(new THREE.TorusGeometry(IR(FILL) - 0.05, 0.022, 10, SEG), new THREE.MeshPhysicalMaterial({ color: 0xffe6c8, roughness: 0.35, transparent: true, opacity: 0.85 }));
+  foam.rotation.x = Math.PI / 2; foam.position.y = FILL + 0.012; foam.renderOrder = 2;
+  body.add(foam);
+
+  // rounded ice cubes floating in the tea
+  const iceMat = new THREE.MeshPhysicalMaterial({
+    color: 0xeef8ff, roughness: 0.06, transparent: true, opacity: 0.6, clearcoat: 1,
+    iridescence: 0.25, envMapIntensity: 1.8, depthWrite: false
+  });
+  const cupIceGeo = new RoundedBoxGeometry(0.4, 0.4, 0.4, 3, 0.1);
+  const cupIce = [
+    [-0.3, FILL + 0.08, 0.24, 0.4], [0.34, FILL + 0.11, 0.1, 1.1], [0.02, FILL + 0.04, -0.36, 2.0],
+    [-0.18, FILL - 0.5, -0.12, 0.7], [0.3, FILL - 0.62, 0.3, 2.6], [-0.36, FILL - 0.95, 0.18, 1.7], [0.12, FILL - 1.2, -0.22, 0.2]
+  ].map(([x, y, z, r], i) => {
+    const m = new THREE.Mesh(cupIceGeo, iceMat);
+    m.position.set(x, y, z); m.rotation.set(r, r * 1.7, r * 0.6);
+    const s = i < 3 ? 1 : 0.82; m.scale.setScalar(s);
+    m.renderOrder = 1; m.castShadow = true;
+    m.userData = { y, r, ph: rand(0, TAU) };
+    body.add(m); return m;
+  });
+
+  // domed lid with rim ridges and straw grommet
+  const L0 = H, lid = [
+    new V2(RT + 0.005, L0 - 0.16), new V2(RT + 0.045, L0 - 0.15), new V2(RT + 0.06, L0 - 0.1),
+    new V2(RT + 0.065, L0 - 0.02), new V2(RT + 0.055, L0 + 0.04), new V2(RT + 0.02, L0 + 0.075),
+    new V2(RT - 0.06, L0 + 0.08), new V2(RT - 0.09, L0 + 0.1)
+  ];
+  for(let i = 0; i <= 28; i++){ const a = (i / 28) * Math.PI / 2; lid.push(new V2(0.15 + (RT - 0.25) * Math.cos(a), L0 + 0.1 + 0.46 * Math.sin(a))); }
+  lid.push(new V2(0.12, L0 + 0.555), new V2(0.11, L0 + 0.5));
+  const lidMat = new THREE.MeshPhysicalMaterial({
+    color: 0xfff3f7, roughness: 0.18, transparent: true, opacity: 0.5, clearcoat: 1,
+    clearcoatRoughness: 0.05, envMapIntensity: 1.4, side: THREE.DoubleSide, depthWrite: false
+  });
+  const lidMesh = new THREE.Mesh(new THREE.LatheGeometry(lid, SEG), lidMat);
+  lidMesh.renderOrder = 4;
+  body.add(lidMesh);
+  const ridgeMat = new THREE.MeshPhysicalMaterial({ color: 0xffffff, roughness: 0.12, clearcoat: 1, transparent: true, opacity: 0.75 });
+  [[RT + 0.066, L0 - 0.12, 0.011], [RT + 0.069, L0 - 0.07, 0.011], [RT + 0.069, L0 - 0.02, 0.011], [RT - 0.1, L0 + 0.1, 0.018], [0.125, L0 + 0.555, 0.026]].forEach(([r, y, t]) => {
+    const m = new THREE.Mesh(new THREE.TorusGeometry(r, t, 8, SEG), ridgeMat);
+    m.rotation.x = Math.PI / 2; m.position.y = y; m.renderOrder = 4; body.add(m);
+  });
+
+  // bendy striped straw (tube along a curve) with rounded tips and accordion rings
+  const sc = document.createElement('canvas'); sc.width = 256; sc.height = 32;
+  const sx = sc.getContext('2d');
+  sx.fillStyle = '#ff6f91'; sx.fillRect(0, 0, 256, 32);
+  sx.fillStyle = '#fff8f0';
+  for(let s = -256; s <= 256; s += 128){ sx.beginPath(); sx.moveTo(s, 0); sx.lineTo(s + 56, 0); sx.lineTo(s + 184, 32); sx.lineTo(s + 128, 32); sx.closePath(); sx.fill(); }
+  const strawTex = new THREE.CanvasTexture(sc);
+  strawTex.colorSpace = THREE.SRGBColorSpace;
+  strawTex.wrapS = strawTex.wrapT = THREE.RepeatWrapping;
+  strawTex.repeat.set(16, 1);
+  strawTex.anisotropy = 4;
+  const strawMat = new THREE.MeshPhysicalMaterial({ map: strawTex, roughness: 0.28, clearcoat: 0.8, clearcoatRoughness: 0.15 });
+  const strawCurve = new THREE.CatmullRomCurve3([
+    new V3(0.14, 0.32, 0.05), new V3(0.07, 1.8, 0.02), new V3(0.015, H + 0.55, 0), new V3(0.0, H + 1.02, 0),
+    new V3(0.12, H + 1.36, 0), new V3(0.42, H + 1.52, 0), new V3(0.7, H + 1.56, 0)
+  ], false, 'centripetal');
+  const SR = 0.08;
+  const straw = new THREE.Mesh(new THREE.TubeGeometry(strawCurve, mobile ? 90 : 160, SR, mobile ? 14 : 22, false), strawMat);
+  straw.castShadow = true;
+  body.add(straw);
+  const capGeo = new THREE.SphereGeometry(SR, 20, 12);
+  [0, 1].forEach(t => { const m = new THREE.Mesh(capGeo, strawMat); m.position.copy(strawCurve.getPointAt(t)); body.add(m); });
+  const ringGeo = new THREE.TorusGeometry(SR + 0.004, 0.013, 8, 24);
+  for(let i = 0; i < 6; i++){
+    const u = 0.69 + i * 0.022, m = new THREE.Mesh(ringGeo, strawMat);
+    m.position.copy(strawCurve.getPointAt(u));
+    m.quaternion.setFromUnitVectors(new V3(0, 0, 1), strawCurve.getTangentAt(u));
+    body.add(m);
+  }
+
+  // cute face (front) + heart sticker (back)
+  const slope = Math.atan((RT - RB) / H);
+  const inkMat = new THREE.MeshPhysicalMaterial({ color: 0x2b1b2e, roughness: 0.25, clearcoat: 1 });
+  const whiteMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+  const blushMat = new THREE.MeshPhysicalMaterial({ color: 0xff8fab, roughness: 0.6, transparent: true, opacity: 0.75 });
+  const onWall = (obj, phi, y, lift = 0.012) => {
+    const r = R(y) + lift; obj.position.set(Math.sin(phi) * r, y, Math.cos(phi) * r);
+    obj.rotation.set(slope, phi, 0, 'YXZ'); body.add(obj); return obj;
+  };
+  const eyeGeo = new THREE.SphereGeometry(0.068, 18, 12), shineGeo = new THREE.SphereGeometry(0.022, 10, 8);
+  [-0.21, 0.21].forEach(phi => {
+    const eye = onWall(new THREE.Mesh(eyeGeo, inkMat), phi, 1.5); eye.scale.set(1, 1.18, 0.45);
+    const shine = new THREE.Mesh(shineGeo, whiteMat); shine.position.set(-0.025, 0.03, 0.05); eye.add(shine);
+    onWall(new THREE.Mesh(new THREE.SphereGeometry(0.075, 16, 10), blushMat), phi * 1.75, 1.34).scale.set(1.35, 0.75, 0.2);
+  });
+  const smile = onWall(new THREE.Mesh(new THREE.TorusGeometry(0.095, 0.02, 8, 24, Math.PI), inkMat), 0, 1.36, 0.016);
+  smile.rotateZ(Math.PI);
+  const heart = new THREE.Shape();
+  heart.moveTo(0, 0.25);
+  heart.bezierCurveTo(0, 0.3, -0.05, 0.45, -0.25, 0.45);
+  heart.bezierCurveTo(-0.55, 0.45, -0.55, 0.1, -0.55, 0.1);
+  heart.bezierCurveTo(-0.55, -0.1, -0.35, -0.32, 0, -0.5);
+  heart.bezierCurveTo(0.35, -0.32, 0.55, -0.1, 0.55, 0.1);
+  heart.bezierCurveTo(0.55, 0.1, 0.55, 0.45, 0.25, 0.45);
+  heart.bezierCurveTo(0.1, 0.45, 0, 0.3, 0, 0.25);
+  const heartGeo = new THREE.ExtrudeGeometry(heart, { depth: 0.06, bevelEnabled: true, bevelThickness: 0.05, bevelSize: 0.05, bevelSegments: 4, curveSegments: 18 });
+  heartGeo.center();
+  onWall(new THREE.Mesh(heartGeo, new THREE.MeshPhysicalMaterial({ color: 0xe91e63, roughness: 0.3, clearcoat: 1, clearcoatRoughness: 0.08, sheen: 0.4, sheenColor: new THREE.Color(0xffc1d9) })), Math.PI, 1.45, 0.02).scale.setScalar(0.34);
+
+  // condensation droplets (instanced tiny spheres on the outer wall)
+  const DROPS = mobile ? 60 : 110;
+  const drops = new THREE.InstancedMesh(new THREE.SphereGeometry(1, 10, 8), new THREE.MeshPhysicalMaterial({
+    color: 0xffffff, roughness: 0, transparent: true, opacity: 0.55, clearcoat: 1, emissive: new THREE.Color(0xffffff), emissiveIntensity: 0.35, envMapIntensity: 2.2, depthWrite: false
+  }), DROPS);
+  { const m = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler(), p = new V3(), s = new V3();
+    for(let i = 0; i < DROPS; i++){
+      let phi, y;
+      do { phi = rand(0, TAU); y = rand(0.25, FILL - 0.05); } while((Math.abs(Math.atan2(Math.sin(phi), Math.cos(phi))) < 0.6 || Math.abs(Math.atan2(Math.sin(phi - Math.PI), Math.cos(phi - Math.PI))) < 0.35) && y > 1.1 && y < 1.75);
+      const r = R(y) + rib(y) + 0.008, sz = rand(0.012, 0.034);
+      p.set(Math.sin(phi) * r, y, Math.cos(phi) * r);
+      q.setFromEuler(e.set(slope, phi, 0, 'YXZ'));
+      s.set(sz, sz * rand(1.1, 1.5), sz * 0.45);
+      drops.setMatrixAt(i, m.compose(p, q, s));
+    } }
+  drops.renderOrder = 5;
+  body.add(drops);
+
+  // invisible hit proxy for hover/tap
+  const hit = new THREE.Mesh(new THREE.CylinderGeometry(RT * 1.08, RB * 1.08, H + 1.7, 16), new THREE.MeshBasicMaterial({ visible: false }));
+  hit.position.y = (H + 1.7) / 2 - 0.05;
+  body.add(hit);
+
+  // soft contact shadow (radial blob) + real shadow catcher, not tilted with the cup
+  const bc = document.createElement('canvas'); bc.width = bc.height = 128;
+  const bx = bc.getContext('2d'), grad = bx.createRadialGradient(64, 64, 0, 64, 64, 64);
+  grad.addColorStop(0, 'rgba(70,30,55,0.55)'); grad.addColorStop(0.45, 'rgba(70,30,55,0.22)'); grad.addColorStop(1, 'rgba(70,30,55,0)');
+  bx.fillStyle = grad; bx.fillRect(0, 0, 128, 128);
+  const blobTex = new THREE.CanvasTexture(bc); blobTex.colorSpace = THREE.SRGBColorSpace;
+  const blobMat = new THREE.MeshBasicMaterial({ map: blobTex, transparent: true, depthWrite: false, toneMapped: false });
+  const blob = new THREE.Mesh(new THREE.PlaneGeometry(2.7, 2.7), blobMat);
+  blob.rotation.x = -Math.PI / 2; blob.position.y = -2.2 + 0.004;
+  anchor.add(blob);
+  const catcher = new THREE.Mesh(new THREE.PlaneGeometry(6, 6), new THREE.ShadowMaterial({ color: 0x5a2a45, opacity: 0.1, depthWrite: false }));
+  catcher.rotation.x = -Math.PI / 2; catcher.position.y = -2.2; catcher.receiveShadow = true;
+  anchor.add(catcher);
+
+  // ---------- bubbles + ice specks (instanced, <=120 total) ----------
+  const NB = mobile ? 40 : 64, NI = mobile ? 22 : 34, NBURST = 18;
+  const bubbleMat = new THREE.MeshPhysicalMaterial({
+    color: 0xffffff, roughness: 0.02, metalness: 0, transparent: true, opacity: 0.34,
+    iridescence: 1, iridescenceIOR: 1.3, iridescenceThicknessRange: [180, 820],
+    clearcoat: 1, clearcoatRoughness: 0, envMapIntensity: 1.7, depthWrite: false
+  });
+  const bubbleGeo = new THREE.SphereGeometry(1, mobile ? 18 : 26, mobile ? 12 : 18);
+  const field = new THREE.Group();
+  scene.add(field);
+  const bubbles = new THREE.InstancedMesh(bubbleGeo, bubbleMat, NB);
+  const specks = new THREE.InstancedMesh(new RoundedBoxGeometry(1, 1, 1, 2, 0.24), iceMat, NI);
+  const burst = new THREE.InstancedMesh(bubbleGeo, bubbleMat, NBURST);
+  [bubbles, specks, burst].forEach(m => { m.instanceMatrix.setUsage(THREE.DynamicDrawUsage); m.frustumCulled = false; field.add(m); });
+  burst.renderOrder = 6;
+  const tints = [0xffffff, 0xffd6e4, 0xf3f8c8, 0xffe2c4, 0xf6dcff].map(c => new THREE.Color(c));
+  for(let i = 0; i < NB; i++) bubbles.setColorAt(i, tints[i % tints.length]);
+  for(let i = 0; i < NBURST; i++) burst.setColorAt(i, tints[(i * 2) % tints.length]);
+
+  let halfH = CAM_Z * TANH, halfW = halfH * camera.aspect;
+  const span = z => (CAM_Z - z) / CAM_Z;   // visible-area scale at depth z
+  const mk = (n, smin, smax) => Array.from({ length: n }, () => {
+    const z = rand(-5, 1.5), k = span(z);
+    return { x: rand(-1.15, 1.15) * halfW * k, y: rand(-1.2, 1.2) * halfH * k, z, vx: 0, vy: 0,
+      up: rand(0.18, 0.55), s: rand(smin, smax), ph: rand(0, TAU), f: rand(0.4, 1.1), rx: rand(0, TAU), ry: rand(0, TAU), squash: 0 };
+  });
+  const B = mk(NB, 0.07, 0.3), I = mk(NI, 0.06, 0.17);
+  const P = Array.from({ length: NBURST }, () => ({ life: 0, x: 0, y: 0, z: 0, vx: 0, vy: 0, vz: 0, s: 0 }));
+
+  // ---------- interaction state ----------
+  const pointer = { nx: 0, ny: 0, x: innerWidth / 2, y: innerHeight / 2, active: false, moved: false };
+  const ray = new THREE.Raycaster(), ndc = new V2();
+  let hovering = false, spinSpeed = 0.45, spinBoost = 0, sq = 0, sqV = 0, hop = 0, hopV = 0;
+  let scrollY = window.scrollY || 0;
+  const interactive = t => t && t.closest && t.closest('a,button,input,textarea,select,label,.chat-panel,.key-banner');
+  const setPointer = e => {
+    pointer.x = e.clientX; pointer.y = e.clientY;
+    pointer.nx = (e.clientX / innerWidth) * 2 - 1; pointer.ny = -(e.clientY / innerHeight) * 2 + 1;
+    pointer.active = true; pointer.moved = true;
+  };
+  const hitTest = () => {
+    ndc.set(pointer.nx, pointer.ny); ray.setFromCamera(ndc, camera);
+    return ray.intersectObject(hit, false).length > 0;
+  };
+  const onMove = e => { setPointer(e); pointer.target = e.target; };
+  const onDown = e => {
+    setPointer(e);
+    if(interactive(e.target)) return;
+    anchor.updateMatrixWorld(true);
+    if(hitTest()){
+      sqV -= 7.5; hopV = 2.6; spinBoost = 7;
+      const top = new V3(0, 0.55, 0); body.localToWorld(top.set(0, H + 0.6, 0));
+      field.worldToLocal(top);
+      for(let i = 0; i < NBURST; i++){
+        const a = rand(0, TAU), el = rand(0.15, 1.2), sp = rand(1.6, 3.4);
+        Object.assign(P[i], { life: 1e-4, x: top.x, y: top.y, z: top.z + 0.6, vx: Math.cos(a) * Math.cos(el) * sp, vy: Math.sin(el) * sp + 0.6, vz: Math.sin(a) * Math.cos(el) * sp * 0.4, s: rand(0.07, 0.2) });
+      }
+    }
+  };
+  const onUp = e => { if(e.pointerType !== 'mouse') pointer.active = false; };
+  const onOut = e => { if(!e.relatedTarget) pointer.active = false; };
+  const onScroll = () => { scrollY = window.scrollY || 0; };
+  addEventListener('pointermove', onMove, { passive: true });
+  addEventListener('pointerdown', onDown, { passive: true });
+  addEventListener('pointerup', onUp, { passive: true });
+  addEventListener('pointercancel', onUp, { passive: true });
+  document.addEventListener('pointerout', onOut, { passive: true });
+  addEventListener('scroll', onScroll, { passive: true });
+
+  // ---------- layout: map #cupStage to world ----------
+  let wupp = 1, cupScale = 1;
+  const layout = () => {
+    const w = innerWidth, h = innerHeight;
+    renderer.setSize(w, h, false);
+    camera.aspect = w / h; camera.updateProjectionMatrix();
+    halfH = CAM_Z * TANH; halfW = halfH * camera.aspect;
+    wupp = (2 * halfH) / h;
+    const r = stage.getBoundingClientRect();
+    cupScale = Math.max(0.2, (r.height * 0.86 * wupp) / 4.9);
+    const sh = key.shadow.camera, e = 3.2 * cupScale;
+    sh.left = -e; sh.right = e; sh.top = e; sh.bottom = -e; sh.near = 0.5; sh.far = 30; sh.updateProjectionMatrix();
+  };
+  layout();
+  let resizeT = 0;
+  const onResize = () => { clearTimeout(resizeT); resizeT = setTimeout(layout, 120); };
+  addEventListener('resize', onResize, { passive: true });
+
+  // ---------- pause when hero is off-screen or tab hidden ----------
+  let inView = true, raf = 0, last = 0, disposed = false, shown = false, t = 0;
+  const visible = new Set();
+  let io = null;
+  if('IntersectionObserver' in window){
+    io = new IntersectionObserver(entries => {
+      entries.forEach(en => en.isIntersecting ? visible.add(en.target) : visible.delete(en.target));
+      inView = visible.size > 0; sync();
+    }, { rootMargin: '80px 0px' });
+    [document.querySelector('header'), stage, heroEl].forEach(el => el && io.observe(el));
+  }
+  const onVis = () => sync();
+  document.addEventListener('visibilitychange', onVis);
+  const onLost = e => { e.preventDefault(); useStill('WebGL context lost'); };
+  canvas.addEventListener('webglcontextlost', onLost);
+  function sync(){
+    const run = !disposed && inView && !document.hidden;
+    if(shown) canvas.style.visibility = (inView && !disposed) ? 'visible' : 'hidden';
+    if(run && !raf){ last = performance.now(); raf = requestAnimationFrame(frame); }
+    else if(!run && raf){ cancelAnimationFrame(raf); raf = 0; }
+  }
+
+  // ---------- animation ----------
+  const m4 = new THREE.Matrix4(), q4 = new THREE.Quaternion(), eu = new THREE.Euler(), pv = new V3(), sv = new V3(), tmp = new V3();
+  const spring = (x, v, k, c, dt) => { const a = -k * x - c * v; v += a * dt; return [x + v * dt, v]; };
+
+  function stepField(arr, mesh, dt, isIce){
+    const top = scrollY * wupp * 0.45;       // parallax: field drifts up slower than content
+    for(let i = 0; i < arr.length; i++){
+      const b = arr[i], k = span(b.z), hw = halfW * k * 1.2, hh = halfH * k * 1.25;
+      const sway = Math.sin(t * b.f + b.ph) * 0.22;
+      b.vx += (sway - b.vx) * Math.min(1, dt * 1.4);
+      b.vy += (b.up - b.vy) * Math.min(1, dt * 1.4);
+      if(pointer.active){
+        const cx = pointer.nx * halfW * k, cy = pointer.ny * halfH * k + top;
+        const dx = b.x - cx, dy = b.y - cy, d = Math.hypot(dx, dy) + 1e-4, rad = 1.9 * k;
+        if(d < rad){ const f = (1 - d / rad) ** 2 * 16; b.vx += dx / d * f * dt; b.vy += dy / d * f * dt; b.squash = Math.min(1, b.squash + f * dt * 0.5); }
+      }
+      b.squash *= Math.max(0, 1 - dt * 3);
+      b.x += b.vx * dt; b.y += b.vy * dt;
+      if(b.y > hh + top){ b.y = -hh + top; b.x = rand(-hw, hw); }
+      if(b.y < -hh + top - 0.5) b.y = hh + top;
+      if(b.x > hw) b.x = -hw; else if(b.x < -hw) b.x = hw;
+      const wob = 1 + Math.sin(t * 3.1 + b.ph) * 0.07, sp = Math.hypot(b.vx, b.vy);
+      pv.set(b.x, b.y - top, b.z);
+      if(isIce){ b.rx += dt * 0.6 * b.f; b.ry += dt * 0.4; q4.setFromEuler(eu.set(b.rx, b.ry, b.ph)); sv.setScalar(b.s * wob); }
+      else { q4.setFromUnitVectors(tmp.set(0, 1, 0), tmp.set(b.vx, b.vy, 0.0001).normalize()); const st = 1 + clamp(sp * 0.12, 0, 0.25) + b.squash * 0.2; sv.set(b.s * wob / Math.sqrt(st), b.s * wob * st, b.s * wob / Math.sqrt(st)); }
+      mesh.setMatrixAt(i, m4.compose(pv, q4, sv));
+    }
+    mesh.instanceMatrix.needsUpdate = true;
+  }
+
+  function frame(now){
+    raf = requestAnimationFrame(frame);
+    try{
+      const dt = Math.min(0.05, Math.max(0.001, (now - last) / 1000)); last = now; t += dt;
+      const progress = clamp(scrollY / Math.max(1, heroEl.offsetTop + heroEl.offsetHeight), 0, 1);
+      if(shown) canvas.style.opacity = String(1 - progress * 0.85);
+
+      // anchor follows the stage element, with scroll parallax
+      const r = stage.getBoundingClientRect();
+      const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+      anchor.position.set((cx / innerWidth * 2 - 1) * halfW, (-(cy / innerHeight) * 2 + 1) * halfH - scrollY * wupp * 0.25, 0);
+      anchor.scale.setScalar(cupScale * (1 - progress * 0.15));
+      anchor.updateMatrixWorld(true);
+
+      if(pointer.moved){ hovering = pointer.active && !interactive(pointer.target) && hitTest(); pointer.moved = false; root.style.cursor = hovering ? 'pointer' : ''; }
+      if(!pointer.active) hovering = false;
+
+      // tilt toward pointer
+      const px = pointer.active ? clamp((pointer.x - cx) / innerWidth * 1.6, -0.4, 0.4) : 0;
+      const py = pointer.active ? clamp((pointer.y - cy) / innerHeight * 1.4, -0.35, 0.35) : 0;
+      const ease = Math.min(1, dt * 4);
+      tilt.rotation.z += (-px - tilt.rotation.z) * ease;
+      tilt.rotation.x += (py - tilt.rotation.x) * ease;
+
+      // spin (faster on hover / after tap / with scroll)
+      spinSpeed += ((hovering ? 2.6 : 0.45) - spinSpeed) * Math.min(1, dt * 2.5);
+      spinBoost *= Math.max(0, 1 - dt * 1.8);
+      spin.rotation.y += (spinSpeed + spinBoost) * dt;
+
+      // squish spring + little hop + gentle bob
+      [sq, sqV] = spring(sq, sqV, 170, 8, dt);
+      hopV -= 9.8 * dt; hop = Math.max(0, hop + hopV * dt); if(hop === 0 && hopV < 0) hopV = 0;
+      squish.scale.set(1 - sq * 0.55, 1 + sq, 1 - sq * 0.55);
+      const bob = Math.sin(t * 1.25) * 0.09;
+      tilt.position.y = bob + hop * 0.5;
+      const lift = clamp(bob + hop * 0.5 + 0.09, 0, 1.5);
+      blob.scale.setScalar(1 - lift * 0.35); blobMat.opacity = 1 - lift * 0.45;
+
+      // ice cubes bob in the tea
+      cupIce.forEach((m, i) => { const u = m.userData; m.position.y = u.y + Math.sin(t * 1.7 + u.ph) * 0.025; m.rotation.y = u.r * 1.7 + Math.sin(t * 0.8 + u.ph) * 0.2; });
+
+      // key light follows the cup so shadows stay tight
+      key.target.position.setFromMatrixPosition(anchor.matrixWorld);
+      key.position.copy(key.target.position).add(tmp.set(4, 7, 6).multiplyScalar(cupScale));
+
+      stepField(B, bubbles, dt, false);
+      stepField(I, specks, dt, true);
+      // burst bubbles from taps
+      let alive = 0;
+      for(let i = 0; i < NBURST; i++){
+        const p = P[i];
+        if(p.life > 0){
+          p.life += dt; p.vx *= 1 - dt * 1.2; p.vy = p.vy * (1 - dt * 1.2) + dt * 0.8; p.vz *= 1 - dt * 1.2;
+          p.x += p.vx * dt; p.y += p.vy * dt; p.z += p.vz * dt;
+          const life = p.life / 1.6, grow = life < 0.2 ? life / 0.2 : (life > 0.82 ? Math.max(0, 1 - (life - 0.82) / 0.18) * 1.15 : 1 + Math.sin(life * 18) * 0.06);
+          if(life >= 1) p.life = 0;
+          sv.setScalar(p.s * grow * cupScale * 2.2 + 1e-5); pv.set(p.x, p.y, p.z); alive++;
+        } else { sv.setScalar(1e-5); pv.set(0, -999, 0); }
+        burst.setMatrixAt(i, m4.compose(pv, q4.identity(), sv));
+      }
+      burst.instanceMatrix.needsUpdate = true;
+      burst.visible = alive > 0;
+
+      renderer.render(scene, camera);
+      if(!shown){ shown = true; canvas.style.opacity = '1'; root.classList.add('has3d'); root.classList.remove('no3d'); }
+    }catch(e){
+      console.warn('[tea3d] render failed:', e && e.message ? e.message : e);
+      useStill();
+    }
+  }
+  sync();
+
+  function dispose(){
+    disposed = true; sync();
+    removeEventListener('pointermove', onMove); removeEventListener('pointerdown', onDown);
+    removeEventListener('pointerup', onUp); removeEventListener('pointercancel', onUp);
+    document.removeEventListener('pointerout', onOut); removeEventListener('scroll', onScroll);
+    removeEventListener('resize', onResize); document.removeEventListener('visibilitychange', onVis);
+    if(io) io.disconnect();
+    root.style.cursor = '';
+    scene.traverse(o => { if(o.geometry) o.geometry.dispose(); if(o.material) [].concat(o.material).forEach(m => { if(m.map) m.map.dispose(); m.dispose(); }); });
+    envRT.dispose(); renderer.dispose();
+    canvas.remove();
+  }
+  // tiny test hook: renders one frame and counts painted pixels (used by local verification)
+  window.__tea3d = {
+    paintedPixels(){
+      renderer.render(scene, camera);
+      const gl = renderer.getContext(), w = gl.drawingBufferWidth, h = gl.drawingBufferHeight, px = new Uint8Array(w * h * 4);
+      gl.readPixels(0, 0, w, h, gl.RGBA, gl.UNSIGNED_BYTE, px);
+      let n = 0; for(let i = 3; i < px.length; i += 4) if(px[i] > 8) n++;
+      return { painted: n, total: w * h };
+    }
+  };
+  return { dispose };
+}
 </script>
 </body>
 </html>
